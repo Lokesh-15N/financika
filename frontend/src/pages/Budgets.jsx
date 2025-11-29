@@ -189,20 +189,20 @@ const Budgets = () => {
               })}
             </tbody>
           </table>
-
-          <BudgetModal
-            isOpen={isBudgetModalOpen}
-            onClose={handleCloseBudgetModal}
-            onSubmit={handleFormSubmit}
-            budget={editingBudget}
-            categories={categories}
-          />
         </div>
       ) : (
         <div className="p-6 bg-white shadow rounded-lg">
           <EmptyState message="No budgets found" />
         </div>
       )}
+      {/* Always render the BudgetModal so it can open regardless of budgets */}
+      <BudgetModal
+        isOpen={isBudgetModalOpen}
+        onClose={handleCloseBudgetModal}
+        onSubmit={handleFormSubmit}
+        budget={editingBudget}
+        categories={categories}
+      />
     </>
   );
 };
