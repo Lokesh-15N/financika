@@ -22,7 +22,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://localhost:3000",
   "http://localhost:5000",
-  "https://financika.netlify.app",
+  "https://paisable-master.onrender.com",
 ];
 
 app.use(
