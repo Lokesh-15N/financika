@@ -20,13 +20,23 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://localhost:3000",
+  "http://localhost:5000",
   "https://financika.netlify.app",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      console.log('CORS request from origin:', origin);
+      if (!origin) {
+        // Allow requests with no origin (like curl, mobile apps, direct browser navigation)
+        return callback(null, true);
+      }
+      // Normalize origin (remove trailing slash if present)
+      const normalizedOrigin = origin.replace(/\/$/, '');
+      const isAllowed = allowedOrigins.some(o => o.replace(/\/$/, '') === normalizedOrigin);
+      if (isAllowed) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -48,11 +58,17 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/budgets', require('./routes/budgetRoutes'));
 app.use('/api/recurring', require('./routes/recurringTransactionRoutes'));
 
+
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.get('/', (req, res) => {
-  res.send('API is Running');
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Fallback to index.html for SPA
+// Serve frontend for all non-API routes (Express v5 regex catch-all)
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
