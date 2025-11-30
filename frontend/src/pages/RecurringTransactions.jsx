@@ -17,14 +17,20 @@ const RecurringTransactions = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [recurringRes, categoriesRes] = await Promise.all([
+      const [recurringRes, expenseCategoriesRes, incomeCategoriesRes] = await Promise.all([
         api.get('/recurring'),
-        api.get('/transactions/categories'),
+        api.get('/transactions/categories/expense'),
+        api.get('/transactions/categories/income'),
       ]);
       setRecurring(recurringRes.data || []);
-      setCategories(categoriesRes.data || []);
+      // Merge and deduplicate categories
+      const allCategories = Array.from(new Set([
+        ...(expenseCategoriesRes.data || []),
+        ...(incomeCategoriesRes.data || [])
+      ]));
+      setCategories(allCategories);
     } catch (err) {
-      console.error('Failed to fetch recurring transactions', err);
+      console.error('Failed to fetch recurring transactions or categories', err);
     } finally {
       setLoading(false);
     }
